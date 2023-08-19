@@ -1,0 +1,155 @@
+input[type=text],
+input[type=password],
+input[type=email] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.login-btn {
+    background-color: #7a0edf;
+    border: none;
+    margin: 8px 0;
+    color: white;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-top: 20px;
+    width: 100%;
+    
+}
+
+.login-btn:hover {
+    opacity: 0.9;
+}
+
+.container {
+    padding: 16px;
+}
+
+.main-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 600px;
+}
+
+.card {
+    padding: 20px;
+    margin-bottom: 50px;
+    width: 500px;
+    border-radius: 30px;
+    background: rgb(94, 116, 82);
+    margin-top: 20px;
+}
+
+.last-para {
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.pic-container>img {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    border-radius: 100px;
+}
+
+.pic-container {
+    text-align: center;
+}
+
+.span-img>img {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    cursor: pointer;
+    margin-top: 110px;
+    margin-left: -20px;
+}
+
+.span-img>input {
+    display: none;
+}
+
+.content-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.row {
+    width: 70%;
+    padding: 20px;
+}
+
+form input[type="file"] {
+    display: none;
+}
+
+.camera-pic>img {
+    width: 30px;
+    height: 30px;
+    margin-left: 150px;
+    margin-top: -50px;
+}
+
+.message-box {
+    width: 45%;
+    background-color: #c7e3f9;
+    padding: 10px;
+    color: #667682;
+    border-radius: 5px;
+}
+
+.chat-box {
+    padding: 10px;
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.chat-container {
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    margin-top: 50px !important;
+}
+
+.right-message {
+    background-color: #6daad7;
+    color: #141414;
+    margin-left: auto;
+}
+
+.container{
+    margin: 0 auto;
+}
+
+.last-para{
+    text-align: center;
+}
+
+body {
+    font-family: Arial, sans-serif;
+  }
+  
+  .dashboard {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  #dashBtn {
+    background-color: #252121;
+  }
