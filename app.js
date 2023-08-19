@@ -233,14 +233,14 @@ updatePro && updatePro.addEventListener("click", async (e) => {
         let newLastName = document.getElementById("lastname").value;
         let uid = localStorage.getItem("user-id"); // Fixed: Changed "uid" to "user-id"
         
-        const fileInput = document.getElementById("FileInput"); // Moved the declaration to this scope
+        const fileInput = document.getElementById("FileInput");
         
-        const imageUrl = await uploadFile(fileInput.files[0]); // Fixed: Used "fileInput" instead of "FileInput"
+        const imageUrl = await uploadFile(fileInput.files[0]); 
         
         const washingtonRef = doc(db, "users", uid);
         await updateDoc(washingtonRef, {
-            fullName: newUserName, // Fixed: Used "newUserName" instead of "fullName.value"
-            lastName: newLastName, // Added: Updating last name
+            fullName: newUserName, 
+            lastName: newLastName, 
             picture: imageUrl
         });
 
