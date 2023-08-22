@@ -151,13 +151,12 @@ const getUserData = async (uid) => {
 onAuthStateChanged(auth, (user) => {
     const uid = localStorage.getItem("user-id")
     if (user && uid) {
-        console.log('iffff')
         getUserData(user.uid)
         if(!location.pathname.includes('/profile.html') && (!location.pathname.includes('/dashboard.html'))){
             location.href = "profile.html"
         }
     } else {
-        console.log('elseee')
+
         if (location.pathname.includes('/index.html') && location.pathname.includes("/register.html")) {
             location.href = "index.html"
         }
@@ -287,59 +286,61 @@ fileInput && fileInput.addEventListener("change", () => {
 
 
 let postBlogBtn = document.getElementById("postBlogBtn");
-
-postBlogBtn && postBlogBtn.addEventListener("click", async(e) => {
-    e.preventDefault()
+postBlogBtn && postBlogBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
     let blogTitle = document.getElementById("blogTitle").value;
     let blogBody = document.getElementById("blogBody").value;
-    let email =  localStorage.getItem('email');
+    let email = localStorage.getItem('email');
 
     try {
         const docRef = await addDoc(collection(db, "blogs"), {
             blogTitle: blogTitle,
-            email : email,
+            email: email,
             blogBody: blogBody
-          });
+        });
 
         Swal.fire({
             icon: 'success',
-            title: 'Blog Added Sucessfully',
-        }).then(()=>{
+            title: 'Blog Added Successfully',
+        }).then(() => {
             window.location.reload();
-        })
-      } catch (e) {
-        console.error("Error adding document: ", e);
+        });
+    } catch (error) {
+        console.error("Error adding document: ", error);
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
             text: error.message,
         });
-      }
+    }
+});
 
+const fetchBlogByEmail = async (email) => {
+    const blogsCollection = collection(db, "blogs");
+    const q = query(blogsCollection, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
 
-})
+    if (!querySnapshot.empty) {
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            // Creating a card for each blog entry
+            blogList.innerHTML += `
+                <div class="card" style="width: 82%;">
+                    <div class="card-body">
+                        <h2>${email}</h2>
+                        <h3>${data.blogTitle} <img src='${fileInput}'/></h3>
+                        <p class="card-text">${data.blogBody}</p>
+                    </div>
+                </div>`;
+        });
+    } else {
+        console.log("No blogs found for this user.");
+    }
+};
 
 const blogList = document.getElementById('blogList');
-
 if (blogList) {
-    async function fetchBlogByEmail(email) {
-        const blogsCollection = collection(db, "blogs");
-      
-        // Perform a query to find the document with the specified email key
-        const q = query(blogsCollection, where("email", "==", email));
-        const querySnapshot = await getDocs(q);
-      
-        if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-                console.log('data ', data)
-          });
-        } else {
-          console.log("No such document!");
-        }
-      }
-      
-      // Call the function with the desired email
-      const emailToFetch = "qazi@gmail.com";
-      fetchBlogByEmail(emailToFetch);
+    const emailToFetch = localStorage.getItem('email');
+    fetchBlogByEmail(emailToFetch);
 }
+
