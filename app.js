@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-auth.js";
-import { getFirestore, setDoc, doc,updateDoc,getDoc  } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-firestore.js";
+import { getFirestore, setDoc, query, where, getDocs, collection, doc, addDoc,updateDoc,getDoc  } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.2.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -22,32 +22,35 @@ const userProfile = document.getElementById("profile-picture");
 
 
 const uploadFile = (file) => {
-    return new Promise((resolve, reject) => {
-        const mountainsRef = ref(storage, `images/${file.name}`);
-        const uploadTask = uploadBytesResumable(mountainsRef, file);
-        uploadTask.on('state_changed',
-            (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                console.log('Upload is ' + progress + '% done');
-                switch (snapshot.state) {
-                    case 'paused':
-                        console.log('Upload is paused');
-                        break;
-                    case 'running':
-                        console.log('Upload is running');
-                        break;
+    console.log('file ', file)
+    if(file){
+        return new Promise((resolve, reject) => {
+            const mountainsRef = ref(storage, `images/${file.name}`);
+            const uploadTask = uploadBytesResumable(mountainsRef, file);
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                    switch (snapshot.state) {
+                        case 'paused':
+                            console.log('Upload is paused');
+                            break;
+                        case 'running':
+                            console.log('Upload is running');
+                            break;
+                    }
+                },
+                (error) => {
+                    reject(error)
+                },
+                () => {
+                    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                        resolve(downloadURL);
+                    });
                 }
-            },
-            (error) => {
-                reject(error)
-            },
-            () => {
-                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    resolve(downloadURL);
-                });
-            }
-        );
-    })
+            );
+        })
+    }
 }   
 
 
@@ -65,9 +68,10 @@ registerBtn && registerBtn.addEventListener("click", (e) => {
             try {
                 const user = userCredential.user;
                 await setDoc(doc(db, "users", user.uid), {
-                    Fullname: userFullname,
-                    Email: userEmail,
-                    Password: userPassward
+                    fullName: userFullname,
+                    email: userEmail,
+                    password: userPassward,
+                    lastName : " ",
                 });
 
                 Swal.fire({
@@ -103,12 +107,26 @@ const getUserData = async (uid) => {
     const docRef = doc(db, "users", uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-        let firstName = document.getElementById("firstName")
-        let lastName = document.getElementById("lastName")
+        let firstName = document.getElementById("firstname")
+        let lastName = document.getElementById("lastname")
         let fullName = firstName + lastName;
         fullName = docSnap.data().fullName;
-        // email.value = docSnap.data().email;
-        // userProfile.src = docSnap.data().picture
+        
+        let fullNameSection = document.getElementById("fullNameSection")
+        if(fullNameSection) fullNameSection.innerHTML = docSnap.data().fullName + " " + docSnap.data().lastName
+        localStorage.setItem('user', docSnap.data())
+        localStorage.setItem('email', docSnap.data().email)
+
+        if(firstName) {
+            firstName.value = docSnap.data().fullName.split(" ")[0]
+            firstName.innerHTML = docSnap.data().fullName.split(" ")[0]
+        }
+        if(lastName) {
+            lastName.value = docSnap.data().lastName || ""
+            lastName.innerHTML = docSnap.data().lastName || ""
+        }
+        console.log('docSnap.data() ', docSnap.data())
+        if(userProfile) userProfile.src = docSnap.data().picture
     } else {
         console.log("No such document!");
     }
@@ -135,11 +153,8 @@ onAuthStateChanged(auth, (user) => {
     if (user && uid) {
         console.log('iffff')
         getUserData(user.uid)
-        if(!location.pathname.includes('/profile.html')){
+        if(!location.pathname.includes('/profile.html') && (!location.pathname.includes('/dashboard.html'))){
             location.href = "profile.html"
-        }
-        else{
-            location.href = "dashboard.html"
         }
     } else {
         console.log('elseee')
@@ -149,6 +164,12 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
+
+let dashBtn = document.getElementById("dashBtn");
+dashBtn && dashBtn.addEventListener("click", (e) => {
+    console.log('zee')
+    location.href="dashboard.html"
+})
 
 let loginBtn = document.getElementById("login-btn");
 loginBtn && loginBtn.addEventListener("click", (e) => {
@@ -222,24 +243,31 @@ if(updatePro){
             let newUserName = document.getElementById("firstname").value;
             let newLastName = document.getElementById("lastname").value;
             let uid = localStorage.getItem("user-id");
+
+            console.log('newLastName ', newLastName)
             
             const fileInput = document.getElementById("FileInput");
-            // const imageUrl = await uploadFile(fileInput.files[0]);
+            const imageUrl = await uploadFile(fileInput.files[0]);
+
+            let dataUpdate ={ 
+                    fullName: newUserName,
+                    lastName: newLastName,
+                    picture: imageUrl
+            }
+
+            if(!imageUrl) delete dataUpdate.picture
             
             const washingtonRef = doc(db, "users", uid);
-            await updateDoc(washingtonRef, {
-                fullName: newUserName,
-                lastName: newLastName,
-                // picture: imageUrl
-            });
+            await updateDoc(washingtonRef, dataUpdate);
     
             Swal.fire({
                 icon: 'success',
                 title: 'User updated successfully',
             }).then(() => {
-                window.location.assign('dashboard.html');
+                // window.location.assign('dashboard.html');
             });
         } catch (error) {
+            console.log('error ', error)
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
@@ -248,40 +276,6 @@ if(updatePro){
         }
     });
     
-    
-    updatePro && updatePro.addEventListener("click", async (e) => {
-        e.preventDefault()
-        try {
-            let newUserName = document.getElementById("firstname").value;
-            let newLastName = document.getElementById("lastname").value;
-            let uid = localStorage.getItem("user-id"); 
-            
-            const fileInput = document.getElementById("FileInput"); 
-            
-            const imageUrl = await uploadFile(fileInput.files[0]); 
-            
-            const washingtonRef = doc(db, "users", uid);
-            await updateDoc(washingtonRef, {
-                fullName: newUserName, 
-                lastName: newLastName, 
-                picture: imageUrl
-            });
-    
-    
-            Swal.fire({
-                icon: 'success',
-                title: 'User updated successfully',
-               
-            });
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: error.message,
-            });
-            window.location.assign('dashBoard.html')
-        }
-    });
 }
 
 
@@ -290,3 +284,62 @@ fileInput && fileInput.addEventListener("change", () => {
     const profilePicture = document.getElementById("profile-picture");
     profilePicture.src = URL.createObjectURL(fileInput.files[0]);
 });
+
+
+let postBlogBtn = document.getElementById("postBlogBtn");
+
+postBlogBtn && postBlogBtn.addEventListener("click", async(e) => {
+    e.preventDefault()
+    let blogTitle = document.getElementById("blogTitle").value;
+    let blogBody = document.getElementById("blogBody").value;
+    let email =  localStorage.getItem('email');
+
+    try {
+        const docRef = await addDoc(collection(db, "blogs"), {
+            blogTitle: blogTitle,
+            email : email,
+            blogBody: blogBody
+          });
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Blog Added Sucessfully',
+        }).then(()=>{
+            window.location.reload();
+        })
+      } catch (e) {
+        console.error("Error adding document: ", e);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: error.message,
+        });
+      }
+
+
+})
+
+const blogList = document.getElementById('blogList');
+
+if (blogList) {
+    async function fetchBlogByEmail(email) {
+        const blogsCollection = collection(db, "blogs");
+      
+        // Perform a query to find the document with the specified email key
+        const q = query(blogsCollection, where("email", "==", email));
+        const querySnapshot = await getDocs(q);
+      
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+                console.log('data ', data)
+          });
+        } else {
+          console.log("No such document!");
+        }
+      }
+      
+      // Call the function with the desired email
+      const emailToFetch = "qazi@gmail.com";
+      fetchBlogByEmail(emailToFetch);
+}
