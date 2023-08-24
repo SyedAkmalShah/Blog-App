@@ -138,7 +138,7 @@ body {
   }
   
   .dashboard {
-    max-width: 800px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 20px;
   }
@@ -150,11 +150,21 @@ body {
     margin-bottom: 20px;
   }
   
-  #dashBtn {
-    background-color: #252121;
-  }
-
   btn-danger{
     display: flex;
     justify-content: end;
+  }
+
+  @media only screen and (max-width: 780px) {
+    .nameSec {
+        font-size: medium;
+    }
+    .newBlog {
+        font-size: medium;
+    }
+    
+    .blog-list {
+        font-size: medium;
+    }
+
   }

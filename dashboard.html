@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -19,13 +19,13 @@
   <div class="container dashboard">
     <header class="mb-4">
       <div class="d-flex justify-content-between align-items-center">
-        <h1 >Welcome, <span id="fullNameSection">User Full Name</span></h1>
+        <h1 class="nameSec" >Welcome, <span id="fullNameSection">User Full Name</span></h1>
         <button id="Profile-btn" class="btn btn-info m-2">Profile</button>
         <button id="logout-btn" class="btn btn-danger m-2">Logout</button>
       </div>
     </header>
     <section class="blog-form">
-      <h2>Create a New Blog Post</h2>
+      <h2 class="newBlog">Create a New Blog Post</h2>
       <form id="blogForm">
         <div class="mb-3">
           <input type="text" id="blogTitle" class="form-control" placeholder="Blog Title (5-50 characters)" required minlength="5" maxlength="50">
@@ -36,11 +36,11 @@
         <button id="postBlogBtn" type="submit" class="btn btn-primary">Post Blog</button>
       </form>
     </section>
-    <section class="blog-list">
-      <h2>Your Blog Posts</h2>
-      <div id="blogList" class="list-group">
-        <!-- Blog posts will be dynamically added here -->
-        
+    <section class="blog-list mt-5">
+      <h2 class="postTxt">Your Blog Posts</h2>
+      <div id="blogList" class="list-group mt-5">
+       
+        <!--  blogs -->
         
       </div>
     </section>
